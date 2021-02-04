@@ -46,6 +46,21 @@ const staffSchema = new mongoose.Schema({
         minlength: 8,
         maxlength: 1024,
     },
+    phone: {
+        type: Number,
+        required: true,
+    },
+    address: {
+        type: String,
+        required: true,
+    },
+    nCode: {
+        type: String,
+        required: true,
+    },
+    education: {
+        type: String,
+    },
 });
 
 const Staff = mongoose.model('Staff', staffSchema);

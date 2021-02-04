@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerValidator } = require('../validator/auth');
+const { registerValidator, loginValidator } = require('../validator/auth');
 const router = express.Router();
 const User = require('./../models/user');
 const { date } = require('./../utils/genDate');
@@ -19,6 +19,15 @@ router.post('/register', async (req, res) => {
         res.status(200).send('registration was successfully completed!');
     } catch (err) {
         res.status(400).send('something went wrong');
+    }
+});
+
+router.post('/login', async (req, res) => {
+    const { error } = await loginValidator(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+    try {
+    } catch (err) {
+        res.status(400).send(err);
     }
 });
 
