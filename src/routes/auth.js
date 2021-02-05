@@ -3,7 +3,8 @@ const { registerValidator, loginValidator } = require('../validator/auth');
 const router = express.Router();
 const User = require('./../models/user');
 const { date } = require('./../utils/genDate');
-const { hash } = require('./../utils/genHash');
+const { hash, checkHash } = require('./../utils/genHash');
+const { genToken } = require('./../core/jwt');
 router.post('/register', async (req, res) => {
     const { error } = await registerValidator(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -26,6 +27,15 @@ router.post('/login', async (req, res) => {
     const { error } = await loginValidator(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     try {
+        const user = await User.findOne({ email: req.body.email });
+        if (!user)
+            return res.status(404).send('email or password is incorrect');
+        let passwordMatch = await checkHash(req.body.password, user.password);
+        if (!passwordMatch === true) {
+            return res.status(404).send('email or password is incorrect');
+        }
+        const token = await genToken(user._id, user.role);
+        res.status(200).send(token);
     } catch (err) {
         res.status(400).send(err);
     }

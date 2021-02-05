@@ -16,4 +16,13 @@ const hash = async (password) => {
     }
 };
 
-module.exports = { hash };
+const checkHash = async (password, hashPassword) => {
+    try {
+        let compiredPassword = await bcrypt.compare(password, hashPassword);
+        return compiredPassword;
+    } catch (err) {
+        return false;
+    }
+};
+
+module.exports = { hash, checkHash };
