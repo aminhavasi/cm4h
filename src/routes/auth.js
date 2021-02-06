@@ -9,6 +9,8 @@ router.post('/register', async (req, res) => {
     const { error } = await registerValidator(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     try {
+        const checkUser = await User.findOne({ email: req.body.email });
+        if (checkUser) return res.status(400).send('this user already exict');
         req.body.date = date;
         let statusHash = await hash(req.body.password);
         if (statusHash.status === 0) {
@@ -35,7 +37,10 @@ router.post('/login', async (req, res) => {
             return res.status(404).send('email or password is incorrect');
         }
         const token = await genToken(user._id, user.role);
-        res.status(200).send(token);
+        if (token === false) throw new Error('token is wrong');
+        res.status(200)
+            .header('x-auth-token', token)
+            .send('login successfully');
     } catch (err) {
         res.status(400).send(err);
     }
